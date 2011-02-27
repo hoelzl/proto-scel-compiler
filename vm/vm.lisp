@@ -13,6 +13,11 @@
    ;; The program counter for the currently running process.
    (pc :accessor pc :initarg :pc 
        :type non-negative-fixnum :initform 0)
+   ;; The global variables of the currently running process.
+   (global-variables :accessor global-variables
+		     :initarg :global-variables
+		     :type hash-table
+		     :initform (make-hash-table))
    ;; The lexical environment of the currently running process.
    (environment :accessor environment :initarg :environment)
    ;; The stack of the currently running process.

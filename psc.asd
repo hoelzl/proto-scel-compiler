@@ -20,7 +20,7 @@
 	       (:module vm
 			:serial t
 			:components ((:file "vm-macros")
-				     (:file "vm-instructions")
+				     (:file "vm-opcodes")
 				     (:file "vm")))
 	       (:module compiler
 			:components ())))

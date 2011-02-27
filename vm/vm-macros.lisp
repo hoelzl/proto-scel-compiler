@@ -3,9 +3,9 @@
 (defmacro define-vm-opcode (name bytecode args &body body)
   "Define a new bytecode opcode.
 
-NAME is the assembler name of the opcode; this will be used as the
-name of a structure that is generated and as the name of the
-constructor for this structure.
+NAME is the assembler name of the opcode; this will be prefixed with a
+%-sign and used as the name of a structure that is generated and as
+the name of the constructor for this structure.
 
 BYTECODE is an integer that is currently ignored.  It is intended to
 serve as the instruction opcode when we move the interpreter to a real
@@ -24,7 +24,9 @@ this opcode.  The following names are available:
 Furthermore, the name of each arg in ARGS is symbol-macrolet to the
 corresponding struct accessor in the structure."
   (declare (ignore bytecode))
-  (let* ((arglist (mapcar (lambda (arg)
+  (let* ((docstring (first body))
+	 (name (symbolicate "%" name))
+	 (arglist (mapcar (lambda (arg)
 			   (if (consp arg)
 			       (destructuring-bind
 				     (slot-name init &key &allow-other-keys) arg
@@ -40,7 +42,13 @@ corresponding struct accessor in the structure."
 			 (:constructor ,name ,arglist))
 	 ,@args)
        (defmethod execute-opcode ((self ,name) vm)
-	 (symbol-macrolet ((env (environment vm))
+	 ,@(if (stringp docstring) (list docstring) '())
+	 (symbol-macrolet ((code (code vm))
+			   (pc (pc vm))
+			   (globals (global-variables vm))
+			   (env (environment vm))
 			   (stack (stack vm))
 			   ,@readers)
-	   ,@body)))))
+	   ,@(if (not (stringp docstring))
+		 body
+		 (rest body)))))))
