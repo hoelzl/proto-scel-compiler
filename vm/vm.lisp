@@ -45,9 +45,8 @@
   (:documentation "Returns the next process of COMPONENT that should
   run, or NIL if a new component should be scheduled."))
 (defgeneric steps-for-current-process (scheduler vm process)
-  (:documentation "Returns the number of VM instructions that the
-  current process should be run before the scheduler is called
-  again."))
+  (:documentation "Returns the number of VM opcodes that the current
+  process should be run before the scheduler is called again."))
 
 (defclass simple-scheduler (vm-scheduler)
   ((steps-per-process :accessor steps-per-process
