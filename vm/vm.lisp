@@ -30,44 +30,6 @@
   (:metaclass structure-class))
 
 
-;;; The VM.
-;;; ======
-
-(deftype component-vector ()
-  "An array of components."
-  '(array (or null vm-component) *))
-
-(declaim (ftype (function () component-vector) make-component-vector))
-(defun make-component-vector ()
-  (make-array 10 :adjustable t :fill-pointer 0
-	      :element-type 'vm-component))
-
-(defclass psc-vm (vm-state-mixin)
-  (;; The components that are currently running, i.e., that have at
-   ;; least one process that is not blocked.
-   (active-components :accessor active-components
-		      :initarg :active-components
-		      :type component-vector
-		      :initform (make-component-vector))
-   ;; The components that are currently blocked because they need
-   ;; input from the tuple space.
-   (suspended-components :accessor suspended-components
-			 :initarg :suspended-components
-			 :type component-vector
-			 :initform (make-component-vector))
-   ;; The index of the currently running component in the
-   ;; ACTIVE-COMPONENTS array, or -1 if no component is executable.
-   (index-of-running-component :accessor index-of-running-component
-			       :initarg :index-of-running-component
-			       :type (and (integer -1) fixnum)
-			       :initform -1)
-   (scheduler :accessor scheduler :initarg :scheduler
-	      :type vm-scheduler :initform (make-instance 'simple-scheduler)))
-  (:documentation "The virtual machine for the Proto SCEL Compiler.")
-  #+(and sbcl optimize-vm)
-  (:metaclass structure-class))
-
-
 ;;; Schedulers.
 ;;; ==========
 
@@ -184,3 +146,42 @@ accepts from other components.")
   (:documentation "A component running on the vm.")
   #+(and sbcl optimize-vm)
   (:metaclass structure-class))
+
+
+;;; The VM.
+;;; ======
+
+(deftype component-vector ()
+  "An array of components."
+  '(array (or null vm-component) *))
+
+(declaim (ftype (function () component-vector) make-component-vector))
+(defun make-component-vector ()
+  (make-array 10 :adjustable t :fill-pointer 0
+	      :element-type 'vm-component))
+
+(defclass psc-vm (vm-state-mixin)
+  (;; The components that are currently running, i.e., that have at
+   ;; least one process that is not blocked.
+   (active-components :accessor active-components
+		      :initarg :active-components
+		      :type component-vector
+		      :initform (make-component-vector))
+   ;; The components that are currently blocked because they need
+   ;; input from the tuple space.
+   (suspended-components :accessor suspended-components
+			 :initarg :suspended-components
+			 :type component-vector
+			 :initform (make-component-vector))
+   ;; The index of the currently running component in the
+   ;; ACTIVE-COMPONENTS array, or -1 if no component is executable.
+   (index-of-running-component :accessor index-of-running-component
+			       :initarg :index-of-running-component
+			       :type (and (integer -1) fixnum)
+			       :initform -1)
+   (scheduler :accessor scheduler :initarg :scheduler
+	      :type vm-scheduler :initform (make-instance 'simple-scheduler)))
+  (:documentation "The virtual machine for the Proto SCEL Compiler.")
+  #+(and sbcl optimize-vm)
+  (:metaclass structure-class))
+
